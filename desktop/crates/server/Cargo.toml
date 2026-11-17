@@ -1,0 +1,33 @@
+[package]
+name = "pechu-server"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]
+anyhow = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+futures-util = { workspace = true }
+pechu-common = { workspace = true }
+pechu-store = { workspace = true }
+pechu-jobs = { workspace = true }
+pechu-gemini = { workspace = true }
+pechu-live = { workspace = true }
+pechu-capture = { workspace = true }
+axum = { version = "0.8.9", features = ["ws", "multipart"] }
+tower-http = { version = "0.7.1", features = ["catch-panic"] }
+rust-embed = "8.14.0"
+keyring = "4.2.0"
+rand = "0.10.4"
+sha2 = "0.11.1"
+subtle = "2.6.1"
+tokio-util = { version = "0.7.20", features = ["io"] }
+tempfile.workspace = true
+# add axum, tower-http, rust-embed, keyring etc. with `cargo add -p pechu-server ...`
+
+[dev-dependencies]
+reqwest = { version = "0.13.5", default-features = false, features = ["json", "multipart", "stream"] }
+tokio-tungstenite = "0.30.0"

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Pechu",
+  "version": "0.1.0",
+  "identifier": "app.pechu.desktop",
+  "build": {},
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "category": "Productivity",
+    "linux": {
+      "appimage": { "bundleMediaFramework": true },
+      "deb": { "depends": ["gstreamer1.0-plugins-base", "gstreamer1.0-plugins-good"] }
+    },
+    "shortDescription": "Record meetings, transcribe them and get notes.",
+    "longDescription": "Pechu records or imports meeting audio, transcribes it (Sarvam, with Gemini as the alternative) and writes notes, a summary and flow charts (Gemini). Meetings and keys stay on this computer.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+/* Desktop app only (added by the server, see assets.rs): the window's own minimize / maximize / close buttons.
+   Fixed at the top-right, over the page's empty top margin, so nothing in the page moves. The buttons float on the page with
+   no box around them. Colours come from the page's own custom properties, so light and dark follow the page's theme with no
+   script. */
+.pw-controls {
+  position: fixed; top: 10px; right: 14px; z-index: 2147483000;
+  display: flex; align-items: center; gap: 2px; height: 28px; padding: 2px 4px;
+  color: var(--muted); opacity: 0.85; user-select: none; -webkit-user-select: none;
+  transition: opacity 0.25s var(--ease, ease);
+}
+.pw-controls:hover, .pw-controls:focus-within { opacity: 1; }
+.pw-controls[hidden] { display: none; }
+.pw-grip, .pw-btn { display: inline-flex; align-items: center; justify-content: center; height: 22px; }
+.pw-grip { width: 24px; cursor: grab; color: var(--faint); }
+.pw-grip:active { cursor: grabbing; }
+.pw-btn {
+  width: 28px; padding: 0; border: 0; border-radius: var(--radius-control, 999px);
+  background: transparent; color: inherit;
+  transition: background-color 0.2s var(--ease, ease), color 0.2s var(--ease, ease);
+}
+.pw-btn svg, .pw-grip svg { display: block; }
+.pw-grip svg { stroke-width: 2; } /* the dots are a little heavier, as there is no box behind them to show them off */
+.pw-btn:hover { background: var(--wash); color: var(--text); }
+.pw-btn:active { background: var(--well); color: var(--text); }
+.pw-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.pw-close:hover { background: var(--coral-pale); color: var(--coral-ink); }
+.pw-close:active { background: color-mix(in srgb, var(--coral) 28%, var(--coral-pale)); color: var(--coral-ink); }
+/* up to 1100px wide the page swaps its sidebar for a 52px top bar whose menu button sits at the right: tuck the cluster in
+   beside that button, centred in the bar, instead of on top of it */
+@media (max-width: 1100px) { .pw-controls { top: 12px; right: 60px; } }
+@media (prefers-reduced-motion: reduce) { .pw-controls, .pw-btn { transition: none; } }

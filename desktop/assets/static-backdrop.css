@@ -1,0 +1,17 @@
+/* Desktop app only (added to the page by crates/server/src/assets.rs; the web version does not load this file).
+   The page background is drawn once and does not move, and the big blurred ribbons are not computed by the window at all:
+   each of the 3 ribbon layers (js/backdrop.js, css/backdrop.css) is shown as a picture that was drawn ahead of time from the
+   very same drawing code, in both themes (assets/backdrop/<theme>-<layer>.webp, made by tools/bake-backdrop; the coral rim
+   light and its theme-dependent strength are already in the pictures). The page still builds the <svg> filters, but they are
+   hidden (display: none), so the web engine never paints them. The slow 70 to 110 second drift is switched off, as
+   css/backdrop.css already does for people who ask their system for reduced motion.
+   Re-run tools/bake-backdrop whenever js/backdrop.js or the --bd-* colours change.
+   The pictures are laid out like the <svg> was (viewBox 1600x1000, xMaxYMin slice = cover, aligned right and top). */
+.bd-layer { animation: none !important; will-change: auto !important; background-repeat: no-repeat; background-position: right top; background-size: cover; }
+.bd-layer svg { display: none; }
+.bd-a { background-image: url(/desktop-assets/backdrop/light-a.webp); }
+.bd-b { background-image: url(/desktop-assets/backdrop/light-b.webp); }
+.bd-c { background-image: url(/desktop-assets/backdrop/light-c.webp); }
+:root[data-theme="dark"] .bd-a { background-image: url(/desktop-assets/backdrop/dark-a.webp); }
+:root[data-theme="dark"] .bd-b { background-image: url(/desktop-assets/backdrop/dark-b.webp); }
+:root[data-theme="dark"] .bd-c { background-image: url(/desktop-assets/backdrop/dark-c.webp); }

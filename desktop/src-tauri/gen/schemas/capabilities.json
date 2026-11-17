@@ -1,0 +1,1 @@
+{"default":{"identifier":"default","description":"The page may call no Tauri commands. All work goes through the local HTTP API.","local":true,"windows":["main"],"permissions":[]}}

@@ -1,0 +1,13 @@
+Bundled fonts (Instrument Sans, Instrument Serif, Noto Sans Tamil)
+
+These fonts are licensed under the SIL Open Font License, Version 1.1.
+https://openfontlicense.org
+
+Sources (downloaded from Google Fonts, the same families public/index.html loads from the CDN):
+  Instrument Sans   https://fonts.google.com/specimen/Instrument+Sans
+  Instrument Serif  https://fonts.google.com/specimen/Instrument+Serif
+  Noto Sans Tamil   https://fonts.google.com/specimen/Noto+Sans+Tamil
+  CSS used:         https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif:wght@400&family=Noto+Sans+Tamil:wght@400;500;600&display=swap
+
+Subsets kept: latin, latin-ext, tamil. Each family is one variable-font file per subset,
+so the weights 400/500/600 share the same file.

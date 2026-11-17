@@ -1,0 +1,12 @@
+# build output and dependencies
+target/
+node_modules/
+
+# never publish keys, settings or meeting data
+.env
+.env.*
+keys.json
+settings.json
+data/
+*.pem
+*.key

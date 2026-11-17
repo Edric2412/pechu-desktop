@@ -1,0 +1,48 @@
+[workspace]
+resolver = "2"
+members = [
+  "crates/common",
+  "crates/text",
+  "crates/audio",
+  "crates/gemini",
+  "crates/sarvam",
+  "crates/live",
+  "crates/store",
+  "crates/jobs",
+  "crates/server",
+  "crates/capture",
+  "src-tauri",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+# Versions shared by every crate. A crate uses one with `serde = { workspace = true }`.
+# Anything else: add it in the crate that needs it with `cargo add <name> -p <crate>`.
+[workspace.dependencies]
+anyhow = "1"
+thiserror = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+futures-util = "0.3"
+tracing = "0.1"
+tempfile = "3"
+uuid = { version = "1", features = ["v4"] }
+pechu-common = { path = "crates/common" }
+pechu-text = { path = "crates/text" }
+pechu-audio = { path = "crates/audio" }
+pechu-gemini = { path = "crates/gemini" }
+pechu-sarvam = { path = "crates/sarvam" }
+pechu-live = { path = "crates/live" }
+pechu-store = { path = "crates/store" }
+pechu-jobs = { path = "crates/jobs" }
+pechu-server = { path = "crates/server" }
+pechu-capture = { path = "crates/capture" }
+
+[profile.release]
+lto = "thin"
+codegen-units = 4
+strip = true

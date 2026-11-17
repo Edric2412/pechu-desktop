@@ -1,0 +1,52 @@
+name: Desktop
+
+# Builds and tests the Rust desktop app. Nothing is signed, published or released here.
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: desktop
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install the system libraries Tauri needs on Ubuntu
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev librsvg2-dev libayatana-appindicator3-dev libxdo-dev libssl-dev pkg-config
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: desktop
+      - name: Rust tests (every crate except the window shell, which needs a screen)
+        run: cargo test --workspace --exclude pechu-desktop
+      - name: The window shell compiles
+        run: cargo build -p pechu-desktop
+      - uses: oven-sh/setup-bun@v2
+      - name: Tests of the page scripts
+        working-directory: .
+        run: bun test tests
+
+  # Windows has not been run by hand yet: this job is how the first Windows problems will show up.
+  # System audio on Windows is written (WASAPI loopback) but has never run on a real Windows machine.
+  windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: desktop
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: desktop
+      - name: Rust tests (every crate except the window shell)
+        run: cargo test --workspace --exclude pechu-desktop
+      - name: The window shell compiles
+        run: cargo build -p pechu-desktop

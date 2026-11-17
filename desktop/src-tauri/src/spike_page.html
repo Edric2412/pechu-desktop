@@ -1,0 +1,91 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Pechu spike</title>
+<style>body{font:14px/1.4 monospace;padding:16px;background:#fff;color:#111}pre{white-space:pre-wrap}</style></head>
+<body><h3>Pechu audio spike (WebKitGTK)</h3><pre id="out"></pre>
+<script>
+const out = document.getElementById('out');
+function log(key, value) {
+  const line = key + ': ' + (typeof value === 'string' ? value : JSON.stringify(value));
+  out.textContent += line + '\n';
+  // Send every line to the Rust side so it is printed on stdout.
+  fetch('/spike-result', { method: 'POST', body: line }).catch(() => {});
+}
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+async function recordFor(stream, mime, ms) {
+  const rec = new MediaRecorder(stream, { mimeType: mime });
+  const chunks = [];
+  rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
+  const stopped = new Promise((r) => (rec.onstop = r));
+  rec.start(500);
+  await sleep(ms);
+  rec.stop();
+  await stopped;
+  const blob = new Blob(chunks);
+  return { size: blob.size, chunks: chunks.length, mimeType: rec.mimeType };
+}
+
+async function run() {
+  log('origin', location.origin);
+  log('userAgent', navigator.userAgent);
+  log('mediaDevices', !!navigator.mediaDevices);
+  log('getDisplayMedia', !!(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia));
+
+  // MediaRecorder support
+  const types = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus', 'audio/mp4'];
+  const supported = {};
+  if (typeof MediaRecorder === 'undefined') log('MediaRecorder', 'MISSING');
+  else for (const t of types) { supported[t] = MediaRecorder.isTypeSupported(t); }
+  log('MediaRecorder.isTypeSupported', supported);
+
+  // AudioContext + AudioWorklet from a Blob URL
+  try {
+    const ctx = new AudioContext();
+    log('AudioContext', 'ok, state=' + ctx.state + ', sampleRate=' + ctx.sampleRate);
+    const code = "class P extends AudioWorkletProcessor{process(i){return true}}registerProcessor('p',P)";
+    const url = URL.createObjectURL(new Blob([code], { type: 'application/javascript' }));
+    await ctx.audioWorklet.addModule(url);
+    const node = new AudioWorkletNode(ctx, 'p');
+    log('AudioWorklet', 'ok (module loaded from blob URL, node created: ' + !!node + ')');
+    await ctx.close();
+  } catch (e) { log('AudioWorklet', 'FAILED ' + e.name + ': ' + e.message); }
+
+  // Microphone
+  let stream = null;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const tr = stream.getAudioTracks()[0];
+    log('getUserMedia(audio)', 'ok, track=' + JSON.stringify(tr.label) + ' settings=' + JSON.stringify(tr.getSettings()));
+  } catch (e) { log('getUserMedia(audio)', 'FAILED ' + e.name + ': ' + e.message); }
+
+  // Devices (labels are only filled in after permission was granted)
+  let inputs = [];
+  try {
+    const devs = await navigator.mediaDevices.enumerateDevices();
+    inputs = devs.filter((d) => d.kind === 'audioinput');
+    log('enumerateDevices', devs.map((d) => d.kind + ' | ' + d.label + ' | id=' + (d.deviceId ? d.deviceId.slice(0, 8) : '')));
+    log('monitor/loopback inputs', inputs.filter((d) => /monitor|loopback|stereo mix/i.test(d.label)).map((d) => d.label));
+  } catch (e) { log('enumerateDevices', 'FAILED ' + e.name + ': ' + e.message); }
+
+  // Real recording: 2 seconds with each supported type
+  if (stream) {
+    for (const t of types) {
+      if (!supported[t]) continue;
+      try { log('record 2s ' + t, await recordFor(stream, t, 2000)); }
+      catch (e) { log('record 2s ' + t, 'FAILED ' + e.name + ': ' + e.message); }
+    }
+    stream.getTracks().forEach((t) => t.stop());
+  }
+
+  // Can a monitor input be opened by id?
+  for (const d of inputs.filter((d) => /monitor/i.test(d.label))) {
+    try {
+      const s = await navigator.mediaDevices.getUserMedia({ audio: { deviceId: { exact: d.deviceId } } });
+      log('open monitor ' + d.label, 'ok, track=' + s.getAudioTracks()[0].label);
+      s.getTracks().forEach((t) => t.stop());
+    } catch (e) { log('open monitor ' + d.label, 'FAILED ' + e.name + ': ' + e.message); }
+  }
+  log('DONE', '');
+}
+run().catch((e) => log('fatal', String(e)));
+</script></body></html>

@@ -1,0 +1,9 @@
+[package]
+name = "pechu-text"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]
+regex = "1.13.1"
+serde_json = { workspace = true }
