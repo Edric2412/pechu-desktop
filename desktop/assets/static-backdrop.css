@@ -15,3 +15,15 @@
 :root[data-theme="dark"] .bd-a { background-image: url(/desktop-assets/backdrop/dark-a.webp); }
 :root[data-theme="dark"] .bd-b { background-image: url(/desktop-assets/backdrop/dark-b.webp); }
 :root[data-theme="dark"] .bd-c { background-image: url(/desktop-assets/backdrop/dark-c.webp); }
+
+/* Scrolling: the frosted-glass blur (backdrop-filter) was the biggest single cost of scrolling in this window.
+   WebKitGTK redraws the blur on the CPU for every panel on every scroll frame. Measured with PECHU_PROBE=1 on a page of 14
+   panels, A/B in the same session (a busy machine, so only compare numbers from the same session): about 36 ms per frame with
+   the blur (about 2 in 3 frames slower than 33 ms), about 25 ms without it (about 1 in 4 slower). That is better, not smooth:
+   what is left is spread over the fixed background pictures (about 3 ms), the panel shadows (1 to 2 ms) and the rounded panel
+   corners (they cause most of the remaining slow frames, but removing them changes the look). `probe.js` repeats this test.
+   The glass tints are a little thicker here, because the blur used to soften the ribbons behind the text.
+   The web version keeps its blur (Chrome does it on the graphics card). PECHU_KEEP_MOTION=1 brings all of this back. */
+.sidebar, .panel, .topbar, .sheet, dialog.modal::backdrop { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+:root { --sidebar: rgba(255, 255, 255, 0.72); --surface: rgba(255, 255, 255, 0.8); }
+:root[data-theme="dark"] { --sidebar: rgba(6, 11, 9, 0.7); --surface: rgba(34, 48, 43, 0.72); }
